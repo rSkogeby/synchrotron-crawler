@@ -12,6 +12,7 @@ Pulling data of which detectors are used from all beamlines of all
     8. Visualise
 
 Install required modules:
-```pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
