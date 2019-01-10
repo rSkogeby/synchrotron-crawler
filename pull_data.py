@@ -13,6 +13,7 @@ import asyncio
 from time import time, sleep
 from pyppeteer import launch
 
+
 def formatted_time(t):
     r_n = 3
     if t <= 1e-3:
@@ -30,6 +31,7 @@ def formatted_time(t):
     else:
         return ''.join([str(t),' s'])
 
+
 def timer(function):
     def f(*args, **kwargs):
         before = time()
@@ -41,15 +43,18 @@ def timer(function):
         return rv
     return f
 
+
 @timer
 async def get_browser():
     return await launch(headless=True)
+
 
 @timer
 async def open_page(browser, url):
     page = await browser.newPage()
     await page.goto(url)
     return page
+
 
 @timer
 def create_db():
@@ -62,6 +67,7 @@ def create_db():
     ''')
     conn.commit()
     return conn, cur
+
 
 @timer
 async def insert_wikipedia_table_into_db(browser, conn, cur):
