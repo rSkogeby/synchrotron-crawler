@@ -1,4 +1,4 @@
-""" Create and fill a database pull_data.sqlite with the Wikipedia list of
+"""Create and fill a database pull_data.sqlite with the Wikipedia list of
 synchrotrons in the world. In addition to the synchrotron name the Wikipedia 
 website address of the synchrotrons, its location, country, energy, circumference,
 year of commissioning and year of decommissioning are recorded.
@@ -9,39 +9,12 @@ __version__ = '1.0'
 __author__ = 'Richard Skogeby'
 
 import sqlite3
-import asyncio
 from time import time, sleep
+
+import asyncio
 from pyppeteer import launch
 
-
-def formatted_time(t):
-    r_n = 3
-    if t <= 1e-3:
-        t = t * 1e6
-        t_string = ''.join([str(round(t,r_n)),' us'])
-        return t_string 
-    if t <= 1e-0:
-        t = t * 1e3
-        t_string = ''.join([str(round(t,r_n)),' ms'])
-        return t_string
-    if t <= 999:
-        t = t * 1e0
-        t_string = ''.join([str(round(t,r_n)),' s'])
-        return t_string
-    else:
-        return ''.join([str(t),' s'])
-
-
-def timer(function):
-    def f(*args, **kwargs):
-        before = time()
-        print('Running', function.__name__, '. . .', end='\r')
-        rv = function(*args, **kwargs)
-        after = time()
-        t = after - before
-        print(function.__name__, 'executed in', formatted_time(t))
-        return rv
-    return f
+from stopwatch import *
 
 
 @timer
