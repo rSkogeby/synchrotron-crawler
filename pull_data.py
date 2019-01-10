@@ -65,6 +65,7 @@ async def insert_wikipedia_table_into_db(browser, conn, cur):
         row.append(wiki_cell)
         if it == 0:
             facility_url = await page.evaluate('(element) => element.href', elements[els])
+            els = els + 1
             row.append(facility_url)
 
         # Insert into database
