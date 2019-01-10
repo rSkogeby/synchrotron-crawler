@@ -4,7 +4,7 @@ website address of the synchrotrons, its location, country, energy, circumferenc
 year of commissioning and year of decommissioning are recorded.
 """
 
-__all__ = ['get_browser', 'open_page', 'insert_wikipedia_table_into_db']
+__all__ = ['get_browser', 'open_page', 'create_db', 'insert_wikipedia_table_into_db']
 __version__ = '1.0'
 __author__ = 'Richard Skogeby'
 
