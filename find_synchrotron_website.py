@@ -7,7 +7,7 @@ Can be run to update database if additional synchrotrons have been
 added to the website.
 """
 
-__all__ = []
+__all__ = ['extract_website']
 __version__ = '0.1'
 __author__ = 'Richard Skogeby'
 
@@ -27,12 +27,13 @@ async def extract_website(browser, cur, conn):
     go into each synchrotron, extract its name and website and store 
     in local database.
     '''
-    
+    #Enter table into open database.
     cur.execute('''CREATE TABLE IF NOT EXISTS Websites
         ( name TEXT, external TEXT, lightsource TEXT )
         ''')
     conn.commit()
-    links = cur.fetchall()
+
+    #Open lightsource.org and process xpaths subdomains with synchrotrons
     page = await open_page(browser, 'https://lightsources.org/lightsources-of-the-world/')
     forms = []
     itr = 1
@@ -44,24 +45,28 @@ async def extract_website(browser, cur, conn):
             forms.pop()
             break
     
+    #Using xpath evaluate page to extract url (href)
     lightsource_url = []
     i = 0
     for form in forms:
         lightsource_url.append(await page.evaluate('(p) => p.href', form[0]))
     await browser.close();
+
+    #Check if subdomain urls (e.g. lightsources.org/.../diamond-light-source) exist
     cur.execute('''SELECT lightsource FROM Websites''')
-    lightsource_url_in_db = cur.fetchall()
-    lightsource_url_in_db = ['%s' % x for x in lightsource_url_in_db]
+    its_database_cell = cur.fetchall()
+    its_database_cell = ['%s' % x for x in its_database_cell] #Turn list of tuples into list of strings
     for i in range(len(forms)):
-        if lightsource_url[i] not in lightsource_url_in_db:
-            browser = await get_browser()
+        if lightsource_url[i] not in its_database_cell: #Do the check mentioned two comments up           
+            #Open page and extract website
+            browser = await get_browser() #Open new browser for every subdomain. Avoids browser timeout error. 
             page = await open_page(browser, lightsource_url[i])
-            external_element = await page.querySelectorAll('div div div div div div div div a')
-            external_header = await page.querySelectorAll('div header h1')
-            external_url = await page.evaluate('(p) => p.href', external_element[0])
-            external_facilities = await page.evaluate('(p) => p.innerText', external_header[0])
+            external_website_element = await page.querySelectorAll('div div div div div div div div a')
+            synchrotron_name_element = await page.querySelectorAll('div header h1')
+            external_website = await page.evaluate('(p) => p.href', external_website_element[0])
+            synchrotron_name = await page.evaluate('(p) => p.innerText', synchrotron_name_element[0])
             cur.execute('''INSERT OR IGNORE INTO Websites(name,external,lightsource)
-            VALUES (?,?,?)''', (external_facilities,external_url,lightsource_url[i]))
+            VALUES (?,?,?)''', (synchrotron_name,external_website,lightsource_url[i]))
             print(lightsource_url[i], 'scraped.')
             conn.commit()
             await browser.close();
