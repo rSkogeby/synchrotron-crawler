@@ -8,7 +8,7 @@ added to the website.
 """
 
 __all__ = ['extract_website']
-__version__ = '0.1'
+__version__ = '1.0'
 __author__ = 'Richard Skogeby'
 
 import sqlite3
